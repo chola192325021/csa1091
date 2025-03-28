@@ -1,0 +1,77 @@
+%{
+#include <stdio.h>
+int spaces = 0, newlines = 0;
+%}
+
+%%
+" " { spaces++; }
+"\n" { newlines++; }
+. ;
+%%
+
+int main() {
+    yylex();
+    printf("Spaces: %d\nNewlines: %d\n", spaces, newlines);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z_][a-zA-Z0-9_]* { printf("Valid Identifier: %s\n", yytext); }
+. { printf("Invalid Identifier\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[A-Z]+ { printf("Capital Word: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+int chars = 0, words = 0, lines = 0;
+%}
+
+%%
+. { chars++; }
+\n { lines++; }
+[a-zA-Z0-9]+ { words++; }
+%%
+
+int main() {
+    yylex();
+    printf("Characters: %d\nWords: %d\nLines: %d\n", chars, words, lines);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
