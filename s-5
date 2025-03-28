@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <string.h>
+
+void removeLeftFactoring(char *productions[], int n) {
+    char common[10];
+    strcpy(common, productions[0]);
+
+    for (int i = 1; i < n; i++) {
+        for (int j = 0; productions[i][j] && common[j]; j++) {
+            if (productions[i][j] != common[j]) {
+                common[j] = '\0';
+                break;
+            }
+        }
+    }
+
+    printf("After removing left factoring:\n");
+    printf("X -> %sY\n", common);
+    for (int i = 0; i < n; i++) {
+        printf("Y -> %s\n", productions[i] + strlen(common));
+    }
+}
+
+int main() {
+    char *productions[] = {"abX", "abY"};
+    removeLeftFactoring(productions, 2);
+    return 0;
+}
+
+%{
+#include <stdio.h>
+int chars = 0, words = 0, lines = 0;
+%}
+
+%%
+. { chars++; }
+\n { lines++; }
+[a-zA-Z0-9]+ { words++; }
+%%
+
+int main() {
+    yylex();
+    printf("Characters: %d\nWords: %d\nLines: %d\n", chars, words, lines);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,} { printf("Valid Email: %s\n", yytext); }
+. { printf("Invalid Email\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[0-9]+ { printf("Constant: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
