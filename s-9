@@ -1,0 +1,65 @@
+#include <stdio.h>
+
+void generateCode(char op, char arg1, char arg2, char res) {
+    printf("%c = %c %c %c\n", res, arg1, op, arg2);
+}
+
+int main() {
+    generateCode('+', 'A', 'B', 'T1');
+    generateCode('*', 'T1', 'C', 'T2');
+    generateCode('-', 'T2', 'D', 'T3');
+    return 0;
+}
+
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char expr[] = "a + b + c + b";
+    char optimized[] = "a + (b * 2) + c";  // Optimized version
+    printf("Before Optimization: %s\n", expr);
+    printf("After Optimization: %s\n", optimized);
+    return 0;
+}
+
+%{
+#include <stdio.h>
+int vowels = 0, consonants = 0;
+%}
+
+%%
+[aAeEiIoOuU] { vowels++; }
+[a-zA-Z] { consonants++; }
+. ;
+%%
+
+int main() {
+    yylex();
+    printf("Vowels: %d\nConsonants: %d\n", vowels, consonants);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+KEYWORD "int"|"float"|"if"|"else"|"return"|"while"
+
+%%
+{KEYWORD} { printf("Keyword: %s\n", yytext); }
+[a-zA-Z_][a-zA-Z0-9_]* { printf("Identifier: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
