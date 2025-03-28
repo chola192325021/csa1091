@@ -1,0 +1,140 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[789][0-9]{9} { printf("Valid Mobile Number: %s\n", yytext); }
+. { printf("Invalid Mobile Number\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+#include <string.h>
+char longest[100] = "";
+%}
+
+%%
+[a-zA-Z]+ { if (strlen(yytext) > strlen(longest)) strcpy(longest, yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    printf("Longest word: %s\n", longest);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+<[^>]+> { printf("HTML Tag: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char input[100];
+int pos = 0;
+
+// Function prototypes
+void E();  // Expression
+void E_prime();
+void T();  // Term
+void T_prime();
+void F();  // Factor
+
+// Function to match and move to the next character
+void match(char expected) {
+    if (input[pos] == expected)
+        pos++;
+    else {
+        printf("Error: Unexpected character '%c'\n", input[pos]);
+        exit(1);
+    }
+}
+
+// **E -> T E'**
+void E() {
+    T();
+    E_prime();
+}
+
+// **E' -> + T E' | ε**
+void E_prime() {
+    if (input[pos] == '+') {
+        match('+');
+        T();
+        E_prime();
+    }
+}
+
+// **T -> F T'**
+void T() {
+    F();
+    T_prime();
+}
+
+// **T' -> * F T' | ε**
+void T_prime() {
+    if (input[pos] == '*') {
+        match('*');
+        F();
+        T_prime();
+    }
+}
+
+// **F -> (E) | id**
+void F() {
+    if (input[pos] == '(') {
+        match('(');
+        E();
+        match(')');
+    } else if (isalnum(input[pos])) {  // id (variable)
+        match(input[pos]);  // Consume the id (single character)
+    } else {
+        printf("Error: Unexpected token '%c'\n", input[pos]);
+        exit(1);
+    }
+}
+
+// **Main function**
+int main() {
+    printf("Enter an arithmetic expression (use 'id' for variables, no spaces): ");
+    scanf("%s", input);
+
+    E(); // Start parsing
+
+    // If the entire string is parsed successfully
+    if (input[pos] == '\0')
+        printf("Parsing Successful!\n");
+    else
+        printf("Parsing Failed at '%c'\n", input[pos]);
+
+    return 0;
+}
