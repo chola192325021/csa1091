@@ -1,0 +1,122 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[0-9]+ { printf("Number: %s\n", yytext); }
+[+\-*/] { printf("Operator: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+#include <string.h>
+char target[20];
+int count = 0;
+%}
+
+%%
+{target} { count++; }
+. ;
+%%
+
+int main() {
+    printf("Enter the word to count: ");
+    scanf("%s", target);
+    yylex();
+    printf("Frequency of '%s': %d\n", target, count);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+#include <string.h>
+char oldWord[20], newWord[20];
+%}
+
+%%
+{oldWord} { printf("%s", newWord); }
+. { putchar(yytext[0]); }
+%%
+
+int main() {
+    printf("Enter the word to replace: ");
+    scanf("%s", oldWord);
+    printf("Enter the new word: ");
+    scanf("%s", newWord);
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to generate intermediate code
+void generateIntermediateCode(char op, char arg1, char arg2, char res) {
+    printf("%c = %c %c %c\n", res, arg1, op, arg2);
+}
+
+// Function to optimize code (Constant Folding)
+void optimizeCode(char expr[]) {
+    int num1, num2, result;
+    char op;
+    
+    if (sscanf(expr, "%d %c %d", &num1, &op, &num2) == 3) {
+        if (op == '+') result = num1 + num2;
+        else if (op == '-') result = num1 - num2;
+        else if (op == '*') result = num1 * num2;
+        else if (op == '/') result = (num2 != 0) ? num1 / num2 : 0;
+        
+        printf("Optimized Code: %d\n", result);
+        return;
+    }
+    printf("No optimization applied: %s\n", expr);
+}
+
+// Function to generate simple assembly code
+void generateAssembly(char expr[]) {
+    printf("\nAssembly Code:\n");
+    printf("MOV AX, %c\n", expr[0]); // Move first operand
+    printf("MOV BX, %c\n", expr[2]); // Move second operand
+    printf("%s BX\n", (expr[1] == '+') ? "ADD" :
+                     (expr[1] == '-') ? "SUB" :
+                     (expr[1] == '*') ? "MUL" :
+                     (expr[1] == '/') ? "DIV" : "UNKNOWN");
+}
+
+int main() {
+    char expr[20];
+    
+    printf("Enter an expression (e.g., A+B): ");
+    scanf("%s", expr);
+    
+    // Generate Intermediate Code
+    printf("\nIntermediate Code:\n");
+    generateIntermediateCode(expr[1], expr[0], expr[2], 'T1');
+    
+    // Perform Optimization
+    optimizeCode(expr);
+    
+    // Generate Assembly Code
+    generateAssembly(expr);
+    
+    return 0;
+}
