@@ -1,0 +1,78 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[A-Z][a-z ]*[.!?] { printf("Valid Sentence: %s\n", yytext); }
+. { printf("Invalid Sentence\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+#include <stdio.h>
+#include <ctype.h>
+
+int main() {
+    char ch;
+    int chars = 0, words = 0, lines = 0, inWord = 0;
+
+    while ((ch = getchar()) != EOF) {
+        chars++;
+        if (ch == '\n') lines++;
+        if (isspace(ch)) inWord = 0;
+        else if (!inWord) {
+            inWord = 1;
+            words++;
+        }
+    }
+
+    printf("Characters: %d\nWords: %d\nLines: %d\n", chars, words, lines);
+    return 0;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[0-9]+ { printf("Number: %s\n", yytext); }
+[a-zA-Z]+ { printf("Word: %s\n", yytext); }
+. ;
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+int pos = 0, neg = 0;
+%}
+
+%%
+[0-9]+ { pos++; }
+-[0-9]+ { neg++; }
+. ;
+%%
+
+int main() {
+    yylex();
+    printf("Positive Numbers: %d\nNegative Numbers: %d\n", pos, neg);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
