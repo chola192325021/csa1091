@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char stack[100];  // Parsing stack
+int top = -1;
+
+// Operator Precedence Table
+int precedence(char op) {
+    if (op == '*' || op == '/') return 2;
+    if (op == '+' || op == '-') return 1;
+    return 0;
+}
+
+// Push to stack
+void push(char c) {
+    stack[++top] = c;
+}
+
+// Pop from stack
+char pop() {
+    return (top == -1) ? '\0' : stack[top--];
+}
+
+// Operator Precedence Parsing Function
+void parse(char expr[]) {
+    printf("Parsing Steps:\n");
+    
+    for (int i = 0; i < strlen(expr); i++) {
+        if (isalnum(expr[i])) {
+            printf("Read operand: %c\n", expr[i]);
+        } else if (precedence(expr[i])) {
+            while (top != -1 && precedence(stack[top]) >= precedence(expr[i])) {
+                printf("Pop operator: %c\n", pop());
+            }
+            push(expr[i]);
+            printf("Push operator: %c\n", expr[i]);
+        }
+    }
+    
+    // Pop remaining operators
+    while (top != -1) {
+        printf("Pop operator: %c\n", pop());
+    }
+}
+
+int main() {
+    char expr[100];
+    
+    printf("Enter an arithmetic expression: ");
+    scanf("%s", expr);
+    
+    parse(expr);
+    
+    return 0;
+}
+
+%{
+#include <stdio.h>
+int line = 1;
+%}
+
+%%
+\n { printf("\n%d ", line++); }
+. { putchar(yytext[0]); }
+%%
+
+int main() {
+    printf("%d ", line++);
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%%
+abc { printf("ABC"); }
+. { putchar(yytext[0]); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+}
+
+int yywrap() {
+    return 1;
+}
+
+
+%{
+#include <stdio.h>
+%}
+
+%%
+https?://[a-zA-Z0-9./-]+ { printf("Valid URL: %s\n", yytext); }
+. { printf("Invalid URL\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
