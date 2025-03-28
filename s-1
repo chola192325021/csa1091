@@ -1,0 +1,81 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+^[aeiouAEIOU][a-zA-Z]* { printf("Valid string: %s\n", yytext); }
+. { printf("Invalid string: %s\n", yytext); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+%}
+
+DIGIT [0-9]
+%%
+^({DIGIT}{2}/{DIGIT}{2}/{DIGIT}{4})$ { printf("Valid DOB: %s\n", yytext); }
+. { printf("Invalid DOB\n"); }
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+%{
+#include <stdio.h>
+int comment_count = 0;
+%}
+
+%%
+"//".* { comment_count++; } 
+"/*"([^*]|\*+[^*/])*\*+"/" { comment_count++; } 
+. { putchar(yytext[0]); }
+%%
+
+int main() {
+    yylex();
+    printf("\nNumber of comments removed: %d\n", comment_count);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+
+#include <stdio.h>
+#include <string.h>
+
+void eliminateLeftRecursion(char nonTerminal, char alpha[], char beta[]) {
+    char newNonTerminal = nonTerminal + '\'';
+
+    printf("Grammar after removing Left Recursion:\n");
+    printf("%c -> %s%c | ε\n", nonTerminal, beta, newNonTerminal);
+    printf("%c -> %s%c | ε\n", newNonTerminal, alpha, newNonTerminal);
+}
+
+int main() {
+    char nonTerminal = 'A';
+    char alpha[10] = "a";  // Recursive part (e.g., A -> Aa)
+    char beta[10] = "b";   // Non-recursive part (e.g., A -> b)
+
+    printf("Given Production Rule:\n");
+    printf("%c -> %c%s | %s\n", nonTerminal, nonTerminal, alpha, beta);
+
+    eliminateLeftRecursion(nonTerminal, alpha, beta);
+    return 0;
+}
